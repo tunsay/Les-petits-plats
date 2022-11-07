@@ -23,6 +23,20 @@ body{
     font: "lato";
 }
 
+ul, li{
+    list-style: none;
+    line-height: 14.4px;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+}
+
+.logo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 section{
     margin: 25px 100px;
 }
@@ -95,6 +109,7 @@ input, input:focus{
     height: 364px;
     background-color: #e7e7e7;
     border-radius: var(--border-radius);
+    max-width: 400px;
 }
 
 .infos-plat{
@@ -126,6 +141,8 @@ input, input:focus{
     font-size: 18px;
     line-height: 21.6px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .right-info-plat{
