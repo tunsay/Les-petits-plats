@@ -1,40 +1,3 @@
-class Ingredient {
-    constructor(data) {
-        this.name = data.ingredient; //Name
-        if (data.quantity) {
-            this.quantity = data.quantity; //Quantity
-        }
-        if (data.unit) {
-            this.unit = data.unit; //Unit
-            if (this.unit == "grammes") {
-                let g = this.unit.slice(0, 1);
-                this.unit = g; //other Unit if g
-            }
-        }
-    }
-}
-
-class Recipe {
-    constructor(data) {
-        this.id = data.id;
-        this.name = data.name;
-        this.servings = data.servings;
-        this.time = data.time;
-        this.description = data.description;
-        this.appliance = data.appliance;
-
-        this.ustensils = [];
-        data.ustensils.forEach(element => {
-            this.ustensils.push(element);
-        });
-
-        this.ingredients = [];
-        data.ingredients.forEach(element => {
-            this.ingredients.push(new Ingredient(element));
-        })
-    }
-}
-
 function recipesFactory(data) {
     const { name, id, servings, ingredients, time, description, appliance, ustensils } = data;
 
@@ -67,6 +30,7 @@ function recipesFactory(data) {
         icon.classList.add('bi', 'bi-clock');
         pDescriptionPlat.classList.add('description-plat');
 
+
         //display information in HTML
         namesPlatDOM.textContent = name;
 
@@ -86,21 +50,21 @@ function recipesFactory(data) {
         spanLeftInfoPlat.append(namesPlatDOM, spanIngredientsList);
         spanIngredientsList.append(ul);
 
+        //Display all ingredients in the balise <li>
         for (let i = 0; i < ingredients.length; i++) {
             let createLI = document.createElement("li");
-
+            // It is possible that there is no quantity so avoid displaying undefined
             if (!ingredients[i].quantity) {
                 ingredients[i].quantity = '';
             }
-
+            // It is possible that there is no unit so avoid displaying undefined
             if (!ingredients[i].unit) {
                 ingredients[i].unit = '';
             }
-
+            // Shorten the word
             if (ingredients[i].unit == 'grammes') {
                 ingredients[i].unit = 'g';
             }
-
             if (ingredients[i].unit == 'cuillères à soupe') {
                 ingredients[i].unit = 'cuillères';
             }
