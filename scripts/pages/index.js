@@ -241,6 +241,11 @@ function displayTags() {
     });
 }
 
+//This function close tags with parameters the type of the array tag, and the name of the tag
+function closeTags(typeTagArray, nameTag) {
+    document.getElementById(nameTag).parentElement.remove();
+}
+
 //click the tags will do something
 function clickTags(htmlElement, typeTag, nameTag) {
     htmlElement.addEventListener('click', (event) => {
@@ -269,45 +274,40 @@ function clickTags(htmlElement, typeTag, nameTag) {
                     ingredientTags.appendChild(spanTag);
                     ingredientTagsArray.push(nameTag);
                 } else {
-                    closeTags(ingredientTagsArray, nameTag);
+                    closeTags(ingredientTagsArray, nameTag)
+                    ingredientTagsArray = ingredientTagsArray.filter(e => e.toLowerCase() !== nameTag.toLowerCase());
                 }
                 break;
                 case "appliance":
                     spanTag.classList.add("color-green");
                     if (!applianceTagsArray.includes(nameTag)) {
                         applianceTags.appendChild(spanTag);
-                    applianceTagsArray.push(nameTag);
-                } else {
-                    closeTags(applianceTagsArray, nameTag);
-                }
-                break;
-                case "ustensil":
-                    spanTag.classList.add("color-red");
-                    if (!ustensilTagsArray.includes(nameTag)) {
-                        ustensilTags.appendChild(spanTag);
-                        ustensilTagsArray.push(nameTag);
+                        applianceTagsArray.push(nameTag);
                     } else {
-                    closeTags(ustensilTagsArray, nameTag);
-                }
-                break;
-
-            default:
+                        closeTags(applianceTagsArray, nameTag);
+                        applianceTagsArray = applianceTagsArray.filter(e => e.toLowerCase() !== nameTag.toLowerCase());
+                    }
+                    break;
+                    case "ustensil":
+                        spanTag.classList.add("color-red");
+                        if (!ustensilTagsArray.includes(nameTag)) {
+                            ustensilTags.appendChild(spanTag);
+                            ustensilTagsArray.push(nameTag);
+                        } else {
+                            closeTags(ustensilTagsArray, nameTag);
+                            ustensilTagsArray = ustensilTagsArray.filter(e => e.toLowerCase() !== nameTag.toLowerCase());
+                        }
+                        break;
+                        
+                        default:
                 break;
         }
-        
+
+        console.log(ingredientTagsArray);
 
         console.log(ingredientTags);
         console.log(event.target.innerText);
     })
-}
-
-//We can also click in the icon search bar
-
-
-//This function close tags with parameters the type of the array tag, and the name of the tag
-function closeTags(typeTagArray ,nameTag) {
-    typeTagArray = typeTagArray.filter(e => e !== nameTag);
-    document.getElementById(nameTag).parentElement.remove();
 }
 
 

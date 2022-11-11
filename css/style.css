@@ -74,11 +74,28 @@ input:focus {
     cursor: pointer;
 }
 
+.list-tags{
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .tag {
     border-radius: var(--border-radius);
     height: 37px;
     padding: 10px 20px;
+    margin-right: 10px;
     color: white;
+    white-space: nowrap;
+    line-height: 50px;
+}
+
+.tag span {
+    text-transform: capitalize;
+}
+
+.tag i{
+    cursor: pointer;
+    margin-left: 5px;
 }
 
 .fields {
