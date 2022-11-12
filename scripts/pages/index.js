@@ -2,7 +2,7 @@
 let ustensilsArray = [];
 let applianceArray = [];
 let ingredientsArray = [];
-let resultRecipes = [];
+let resultRecipes = recipes;
 
 //array des tags
 let ingredientTagsArray = [];
@@ -22,12 +22,18 @@ const ustensilField = document.querySelector(".field.color-red");
 const ustensilInput = document.querySelector(".input-ustensil");
 const searchBarRecipe = document.querySelector(".search-recette");
 const researchIcon = document.querySelector(".research-bar .bi");
-const closeTagIcon = document.querySelector(".tag .bi");
+const closeTagIcon = document.querySelector(".tag i");
 const yourResultWord = document.querySelector(".you-have-type-this-research");
 
 //take value of the search bar while type Enter
 searchBarRecipe.addEventListener('keyup', (e) => {
     if (e.key != "Enter" || e.target.value.length < 3) return
+    displayResultFromSearchBar(e.target.value);
+});
+
+searchBarRecipe.addEventListener('keyup', (e) => {
+    if (e.key != "Enter" || e.target.value.length > 2) return
+    e.target.value = "";
     displayResultFromSearchBar(e.target.value);
 });
 
@@ -40,34 +46,24 @@ researchIcon.addEventListener('click', () => {
 //Display your result after a event, with parameters the element Html Value
 function displayResultFromSearchBar(elementHtmlValue) {
     yourResultWord.innerHTML = "";
-    yourResultWord.append(`Voici le résultat de votre recherche : "${elementHtmlValue}" `)
+    if (elementHtmlValue) {
+        yourResultWord.append(`Voici le résultat de votre recherche : "${elementHtmlValue}" `)
+    } else {
+        yourResultWord.append(`Votre résultat doit faire au moins 3 lettres pour rechercher !`)
+    }
 
-    document.getElementById('list-recette-section').innerHTML = "";
-    ingredientList.innerHTML = "";
-    applianceList.innerHTML = "";
-    ustensilList.innerHTML = "";
 
-    const resultRecipes = recipes.filter(recipe => { //Récupère chaque Recipe avec filter, ceci est une boucle
+    resultRecipes = recipes.filter(recipe => { //Récupère chaque Recipe avec filter, ceci est une boucle
         let resultRecipesByName = recipe.name.toLowerCase().includes(elementHtmlValue.toLowerCase()); //vérifie si le recipe name concorde avec la value du input, si oui return la valeur dans resultRecipes
         let resultRecipesByDescription = recipe.description.toLowerCase().includes(elementHtmlValue.toLowerCase());
         let resultRecipesByIngredient = recipe.ingredients.filter(ing => ing.ingredient.toLowerCase().includes(elementHtmlValue.toLowerCase()));
         if (resultRecipesByName || resultRecipesByDescription || resultRecipesByIngredient.length >= 1) {
-            return true; //return la valeur puis sors de la fonction
+            return true; //return la valeur puis reboucle la fonction
         }
-        return false;//Si pas sorti de la fonction return false
+        return false;//Sinon return false
     });
 
-
-    if (resultRecipes == "") {
-        document.getElementById('list-recette-section').innerHTML = "Désolé, vos recherches ont rien données !";
-    }
-
-    displayRecipes(resultRecipes);
-    ustensilsArray = [];
-    applianceArray = [];
-    ingredientsArray = [];
-    createTagsArrays(resultRecipes);
-    displayTags();
+    updateResultAfterResearch(resultRecipes);
 }
 
 function filterInputFieldByType(inputType, listType, arrayType, e) {
@@ -126,9 +122,6 @@ function filterInputFieldByType(inputType, listType, arrayType, e) {
         });
 
     } else {
-        ingredientList.innerHTML = "";
-        applianceList.innerHTML = "";
-        ustensilList.innerHTML = "";
         displayTags();
     }
 }
@@ -140,7 +133,7 @@ ingredientInput.addEventListener('keyup', (e) => {
 });
 
 applianceInput.addEventListener('keyup', (e) => {
-    filterInputFieldByType(applianceInput, applianceList, appliancesArray, e)
+    filterInputFieldByType(applianceInput, applianceList, applianceArray, e)
 });
 
 ustensilInput.addEventListener('keyup', (e) => {
@@ -150,6 +143,7 @@ ustensilInput.addEventListener('keyup', (e) => {
 
 function displayRecipes(recipes) {
     const listRecipesSection = document.getElementById('list-recette-section');
+    listRecipesSection.innerHTML = "";
     //create and display each article since factory
     // recipes.forEach((recipe) => {
     //     const recipeModel = recipesFactory(recipe);
@@ -185,6 +179,9 @@ ustensilField.addEventListener('mouseout', () => {
 });
 
 function createTagsArrays(recipeArray) {
+    ustensilsArray = [];
+    applianceArray = [];
+    ingredientsArray = [];
     recipeArray.map((recipe) => {
         //ustenstiles array
         recipe.ustensils.map((ustensil) => {
@@ -202,6 +199,9 @@ function createTagsArrays(recipeArray) {
 }
 
 function displayTags() {
+    ingredientList.innerHTML = "";
+    applianceList.innerHTML = "";
+    ustensilList.innerHTML = "";
     const ulIngredient = document.createElement('ul');
     const ulAppliance = document.createElement('ul');
     const ulUstensil = document.createElement('ul');
@@ -243,7 +243,9 @@ function displayTags() {
 
 //This function close tags with parameters the type of the array tag, and the name of the tag
 function closeTags(typeTagArray, nameTag) {
+    typeTagArray = typeTagArray.filter(e => e.toLowerCase() !== nameTag.toLowerCase());
     document.getElementById(nameTag).parentElement.remove();
+    return typeTagArray;
 }
 
 //click the tags will do something
@@ -262,6 +264,28 @@ function clickTags(htmlElement, typeTag, nameTag) {
         spanTag.classList.add("tag");
         iconI.classList.add("bi", "bi-x-circle");
 
+        //Click in the cross to remove the tag
+        iconI.addEventListener('click', (e) => {
+            //Get the parent of the parent to the element of cross to display the class name
+            switch (e.target.parentElement.classList[1]) {
+                case "color-blue":
+                    ingredientTagsArray = closeTags(ingredientTagsArray, nameTag);
+                    updateResultAfterResearch(resultRecipes);
+                    break;
+                case "color-green":
+                    applianceTagsArray = closeTags(applianceTagsArray, nameTag);
+                    updateResultAfterResearch(resultRecipes);
+                    break;
+                case "color-red":
+                    ustensilTagsArray = closeTags(ustensilTagsArray, nameTag);
+                    updateResultAfterResearch(resultRecipes);
+                    break;
+                default:
+                    break;
+            }
+
+        })
+
         pTag.textContent = nameTag;
         pTag.setAttribute("id", nameTag);
         spanTag.appendChild(pTag);
@@ -273,43 +297,97 @@ function clickTags(htmlElement, typeTag, nameTag) {
                 if (!ingredientTagsArray.includes(nameTag)) {
                     ingredientTags.appendChild(spanTag);
                     ingredientTagsArray.push(nameTag);
+
+                    updateResultAfterResearch(resultRecipes);
                 } else {
-                    closeTags(ingredientTagsArray, nameTag)
-                    ingredientTagsArray = ingredientTagsArray.filter(e => e.toLowerCase() !== nameTag.toLowerCase());
+                    ingredientTagsArray = closeTags(ingredientTagsArray, nameTag);
+                    updateResultAfterResearch(resultRecipes);
                 }
                 break;
-                case "appliance":
-                    spanTag.classList.add("color-green");
-                    if (!applianceTagsArray.includes(nameTag)) {
-                        applianceTags.appendChild(spanTag);
-                        applianceTagsArray.push(nameTag);
-                    } else {
-                        closeTags(applianceTagsArray, nameTag);
-                        applianceTagsArray = applianceTagsArray.filter(e => e.toLowerCase() !== nameTag.toLowerCase());
-                    }
-                    break;
-                    case "ustensil":
-                        spanTag.classList.add("color-red");
-                        if (!ustensilTagsArray.includes(nameTag)) {
-                            ustensilTags.appendChild(spanTag);
-                            ustensilTagsArray.push(nameTag);
-                        } else {
-                            closeTags(ustensilTagsArray, nameTag);
-                            ustensilTagsArray = ustensilTagsArray.filter(e => e.toLowerCase() !== nameTag.toLowerCase());
-                        }
-                        break;
-                        
-                        default:
+            case "appliance":
+                spanTag.classList.add("color-green");
+                if (!applianceTagsArray.includes(nameTag)) {
+                    applianceTags.appendChild(spanTag);
+                    applianceTagsArray.push(nameTag);
+
+                    resultRecipes = resultRecipes.filter(recipe => {
+                        return recipe.appliance.toLowerCase().includes(applianceTagsArray[0].toLowerCase());
+                    });
+
+                    updateResultAfterResearch(resultRecipes);
+
+                } else {
+                    applianceTagsArray = closeTags(applianceTagsArray, nameTag);
+                    updateResultAfterResearch(resultRecipes);
+                }
+                break;
+            case "ustensil":
+                spanTag.classList.add("color-red");
+                if (!ustensilTagsArray.includes(nameTag)) {
+                    ustensilTags.appendChild(spanTag);
+                    ustensilTagsArray.push(nameTag);
+
+                    updateResultAfterResearch(resultRecipes);
+                } else {
+                    ustensilTagsArray = closeTags(ustensilTagsArray, nameTag);
+                    updateResultAfterResearch(resultRecipes);
+                }
+                break;
+
+            default:
                 break;
         }
-
-        console.log(ingredientTagsArray);
-
-        console.log(ingredientTags);
-        console.log(event.target.innerText);
     })
 }
 
+function updateResultAfterResearch(resultRecipes) {
+
+    resultRecipes = recipes;
+
+
+    resultRecipes = recipes.filter(recipe => { //Récupère chaque Recipe avec filter, ceci est une boucle
+        let resultRecipesByName = recipe.name.toLowerCase().includes(searchBarRecipe.value.toLowerCase()); //vérifie si le recipe name concorde avec la value du input, si oui return la valeur dans resultRecipes
+        let resultRecipesByDescription = recipe.description.toLowerCase().includes(searchBarRecipe.value.toLowerCase());
+        let resultRecipesByIngredient = recipe.ingredients.filter(ing => ing.ingredient.toLowerCase().includes(searchBarRecipe.value.toLowerCase()));
+        if (resultRecipesByName || resultRecipesByDescription || resultRecipesByIngredient.length >= 1) {
+            return true; //return la valeur puis reboucle la fonction
+        }
+        return false;//Sinon return false
+    });
+
+
+    if (applianceTagsArray.length > 0) {
+
+        // resultRecipes = resultRecipes.filter(recipe => {
+        //     return recipe.appliance.toLowerCase().includes(applianceTagsArray[0]);
+        // });
+
+    }
+
+    if (ingredientTagsArray.length > 0) {
+        // resultRecipes = recipes.filter(recipe => {
+        //     let resultRecipesByIngredient = recipe.ingredients.filter(ing => ing.ingredient.toLowerCase().includes(ingredientTagsArray[0]));
+        //     if (resultRecipesByIngredient.length >= 1) {
+        //         return true; //return la valeur puis reboucle la fonction
+        //     }
+        //     return false;//Sinon return false
+        // })
+    }
+
+
+    if (ustensilTagsArray.length > 0) {
+
+    }
+
+
+    console.log(resultRecipes);
+    console.log("ingredient array: " + ingredientTagsArray);
+    console.log("appareikl array: " + applianceTagsArray);
+    console.log("usrensil array: " + ustensilTagsArray);
+    displayRecipes(resultRecipes);
+    createTagsArrays(resultRecipes);
+    displayTags();
+}
 
 function init() {
     displayRecipes(recipes);
