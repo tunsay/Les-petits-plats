@@ -1,16 +1,17 @@
-//arrays des items des recettes
+//arrays of items recipes
 let ustensilsArray = [];
 let applianceArray = [];
 let ingredientsArray = [];
 let resultRecipes = recipes;
 
-//array des tags
+//array tags
 let ingredientTagsArray = [];
 let applianceTagsArray = [];
 let ustensilTagsArray = [];
 
 //dom elements
 const fields = document.querySelectorAll(".field");
+const allInput = document.querySelectorAll(".fields .field input");
 const ingredientList = document.querySelector(".list-ingredient");
 const ingredientField = document.querySelector(".field.color-blue");
 const ingredientInput = document.querySelector(".input-ingredient");
@@ -24,6 +25,20 @@ const searchBarRecipe = document.querySelector(".search-recette");
 const researchIcon = document.querySelector(".research-bar .bi");
 const closeTagIcon = document.querySelector(".tag i");
 const yourResultWord = document.querySelector(".you-have-type-this-research");
+
+//Change placeholder when hover
+allInput.forEach(input => {
+    input.parentElement.parentElement.addEventListener('mouseover', () => {
+        input.setAttribute("placeholder", `Rechercher un ${input.name}...`);
+    });
+});
+
+//Change placeholder when mousout
+allInput.forEach(input => {
+    input.parentElement.parentElement.addEventListener('mouseout', () => {
+        input.setAttribute("placeholder", `${input.name}`);
+    });
+});
 
 //take value of the search bar while type Enter
 searchBarRecipe.addEventListener('keyup', (e) => {
@@ -47,26 +62,30 @@ researchIcon.addEventListener('click', () => {
 function displayResultFromSearchBar(elementHtmlValue) {
     yourResultWord.innerHTML = "";
     if (elementHtmlValue) {
+        yourResultWord.style.color = "grey";
         yourResultWord.append(`Voici le résultat de votre recherche : "${elementHtmlValue}" `)
     } else {
+        yourResultWord.style.color = "red";
         yourResultWord.append(`Votre résultat doit faire au moins 3 lettres pour rechercher !`)
     }
-
-
-    resultRecipes = recipes.filter(recipe => { //Récupère chaque Recipe avec filter, ceci est une boucle
-        let resultRecipesByName = recipe.name.toLowerCase().includes(elementHtmlValue.toLowerCase()); //vérifie si le recipe name concorde avec la value du input, si oui return la valeur dans resultRecipes
-        let resultRecipesByDescription = recipe.description.toLowerCase().includes(elementHtmlValue.toLowerCase());
-        let resultRecipesByIngredient = recipe.ingredients.filter(ing => ing.ingredient.toLowerCase().includes(elementHtmlValue.toLowerCase()));
-        if (resultRecipesByName || resultRecipesByDescription || resultRecipesByIngredient.length >= 1) {
-            return true; //return la valeur puis reboucle la fonction
-        }
-        return false;//Sinon return false
-    });
-
     updateResultAfterResearch(resultRecipes);
 }
 
+ingredientInput.addEventListener('keyup', (e) => {
+    filterInputFieldByType(ingredientInput, ingredientList, ingredientsArray, e)
+});
+
+applianceInput.addEventListener('keyup', (e) => {
+    filterInputFieldByType(applianceInput, applianceList, applianceArray, e)
+});
+
+ustensilInput.addEventListener('keyup', (e) => {
+    filterInputFieldByType(ustensilInput, ustensilList, ustensilsArray, e)
+});
+
+// This function filters tags based on type
 function filterInputFieldByType(inputType, listType, arrayType, e) {
+    ulType = document.createElement('ul');
     let newArrayType = [];
     switch (inputType) {
         case ingredientInput:
@@ -87,7 +106,6 @@ function filterInputFieldByType(inputType, listType, arrayType, e) {
             typeNameUniversal = "ustensil"
             newArrayType = `newUstensilsArray`;
             break;
-
         default:
             break;
     }
@@ -126,21 +144,6 @@ function filterInputFieldByType(inputType, listType, arrayType, e) {
     }
 }
 
-ulType = document.createElement('ul');
-
-ingredientInput.addEventListener('keyup', (e) => {
-    filterInputFieldByType(ingredientInput, ingredientList, ingredientsArray, e)
-});
-
-applianceInput.addEventListener('keyup', (e) => {
-    filterInputFieldByType(applianceInput, applianceList, applianceArray, e)
-});
-
-ustensilInput.addEventListener('keyup', (e) => {
-    filterInputFieldByType(ustensilInput, ustensilList, ustensilsArray, e)
-});
-
-
 function displayRecipes(recipes) {
     const listRecipesSection = document.getElementById('list-recette-section');
     listRecipesSection.innerHTML = "";
@@ -148,32 +151,13 @@ function displayRecipes(recipes) {
         listRecipesSection.innerText = "Vos Recherches ont rien données, essayez de chercher un ingrédient valide !";
     }
 
+    //Display card in the result
     recipes.map((recipe) => {
         const recipeModel = recipesFactory(recipe);
         const recipeCardDOM = recipeModel.getRecipeCardDOM();
         listRecipesSection.appendChild(recipeCardDOM);
     });
 };
-
-ingredientField.addEventListener('mouseover', () => {
-    document.querySelector(".input-ingredient").setAttribute("placeholder", "Rechercher un ingredient...");
-});
-applianceField.addEventListener('mouseover', () => {
-    document.querySelector(".input-appliance").setAttribute("placeholder", "Rechercher un appliance...");
-});
-ustensilField.addEventListener('mouseover', () => {
-    document.querySelector(".input-ustensil").setAttribute("placeholder", "Rechercher un ustensil...");
-});
-
-ingredientField.addEventListener('mouseout', () => {
-    document.querySelector(".input-ingredient").setAttribute("placeholder", "Ingredient");
-});
-applianceField.addEventListener('mouseout', () => {
-    document.querySelector(".input-appliance").setAttribute("placeholder", "Appareil");
-});
-ustensilField.addEventListener('mouseout', () => {
-    document.querySelector(".input-ustensil").setAttribute("placeholder", "Ustensil");
-});
 
 function createTagsArrays(recipeArray) {
     ustensilsArray = [];
@@ -264,7 +248,7 @@ function closeTags(typeTagArray, nameTag) {
 
 //click the tags will do something
 function clickTags(htmlElement, typeTag, nameTag) {
-    htmlElement.addEventListener('click', (event) => {
+    htmlElement.addEventListener('click', () => {
 
         //dom elements
         const ingredientTags = document.querySelector(".ingredient-tags");
@@ -279,26 +263,7 @@ function clickTags(htmlElement, typeTag, nameTag) {
         iconI.classList.add("bi", "bi-x-circle");
 
         //Click in the cross to remove the tag
-        iconI.addEventListener('click', (e) => {
-            //Get the parent of the parent to the element of cross to display the class name
-            switch (e.target.parentElement.classList[1]) {
-                case "color-blue":
-                    ingredientTagsArray = closeTags(ingredientTagsArray, nameTag);
-                    updateResultAfterResearch(resultRecipes);
-                    break;
-                case "color-green":
-                    applianceTagsArray = closeTags(applianceTagsArray, nameTag);
-                    updateResultAfterResearch(resultRecipes);
-                    break;
-                case "color-red":
-                    ustensilTagsArray = closeTags(ustensilTagsArray, nameTag);
-                    updateResultAfterResearch(resultRecipes);
-                    break;
-                default:
-                    break;
-            }
-
-        })
+        clickOnCrossForCloseTag(iconI, nameTag);
 
         pTag.textContent = nameTag;
         pTag.setAttribute("id", nameTag);
@@ -321,12 +286,7 @@ function clickTags(htmlElement, typeTag, nameTag) {
                     applianceTags.appendChild(spanTag);
                     applianceTagsArray.push(nameTag);
 
-                    resultRecipes = resultRecipes.filter(recipe => {
-                        return recipe.appliance.toLowerCase().includes(applianceTagsArray[0].toLowerCase());
-                    });
-
                     updateResultAfterResearch(resultRecipes);
-
                 }
                 break;
             case "ustensil":
@@ -345,11 +305,34 @@ function clickTags(htmlElement, typeTag, nameTag) {
     })
 }
 
-function updateResultAfterResearch(resultRecipes) {
+//This function able to close tag
+function clickOnCrossForCloseTag(elementHtml, nameTag) {
+    elementHtml.addEventListener('click', (e) => {
+        //Get the parent of the parent to the element of cross to display the class name
+        switch (e.target.parentElement.classList[1]) {
+            case "color-blue":
+                ingredientTagsArray = closeTags(ingredientTagsArray, nameTag);
+                updateResultAfterResearch(resultRecipes);
+                break;
+            case "color-green":
+                applianceTagsArray = closeTags(applianceTagsArray, nameTag);
+                updateResultAfterResearch(resultRecipes);
+                break;
+            case "color-red":
+                ustensilTagsArray = closeTags(ustensilTagsArray, nameTag);
+                updateResultAfterResearch(resultRecipes);
+                break;
+            default:
+                break;
+        }
+    })
+}
 
+function updateResultAfterResearch(resultRecipes) {
+    //1- First of all put all recipes in resultRecipes
     resultRecipes = recipes;
 
-
+    //2- Filter resultRecipes by the value of the searchBar
     resultRecipes = recipes.filter(recipe => { //Récupère chaque Recipe avec filter, ceci est une boucle
         let resultRecipesByName = recipe.name.toLowerCase().includes(searchBarRecipe.value.toLowerCase()); //vérifie si le recipe name concorde avec la value du input, si oui return la valeur dans resultRecipes
         let resultRecipesByDescription = recipe.description.toLowerCase().includes(searchBarRecipe.value.toLowerCase());
@@ -360,7 +343,7 @@ function updateResultAfterResearch(resultRecipes) {
         return false;//Sinon return false
     });
 
-    //TAGS CHECK
+    //3- TAGS CHECK
     if (applianceTagsArray.length > 0) {
 
         resultRecipes = resultRecipes.filter(recipe => {
@@ -397,6 +380,7 @@ function updateResultAfterResearch(resultRecipes) {
     displayTags();
 }
 
+//Display all recipes for the begining
 function init() {
     displayRecipes(recipes);
     createTagsArrays(recipes);

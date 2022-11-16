@@ -17,9 +17,6 @@ function recipesFactory(data) {
         const icon = document.createElement('i');
         const pDescriptionPlat = document.createElement('p');
 
-        //element temporaire
-        const spanAppliance = document.createElement('span');
-
         //Add Classes in the element selectionate
         article.classList.add('box-plat');
         divInfosPlat.classList.add('infos-plat');
@@ -32,7 +29,6 @@ function recipesFactory(data) {
         icon.classList.add('bi', 'bi-clock');
         pDescriptionPlat.classList.add('description-plat');
 
-
         //display information in HTML
         namesPlatDOM.textContent = name;
 
@@ -44,17 +40,6 @@ function recipesFactory(data) {
             let descriptionShorten = this.description.slice(0, maxLength);
             pDescriptionPlat.textContent = descriptionShorten + `...`; //Otherwise put the text here with his limit text
         }
-
-        spanAppliance.textContent = appliance;
-        spanImgPlat.appendChild(spanAppliance);
-
-        //List of ustensils provisoire
-        ustensils.map((elementName, i) => { 
-            let createLI = document.createElement("li");
-            createLI.innerText = elementName;
-            ul.appendChild(createLI);
-        });
-
 
         article.appendChild(divInfosPlat);
         divInfosPlat.append(spanImgPlat, spanTextRecettePlat);
