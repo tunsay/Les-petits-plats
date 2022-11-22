@@ -1,5 +1,5 @@
 function recipesFactory(data) {
-    const { name, id, servings, ingredients, time, description, appliance, ustensils } = data;
+    const { name,ingredients, time, description } = data;
 
     function getRecipeCardDOM() {
 
@@ -34,10 +34,10 @@ function recipesFactory(data) {
 
         //Minimize the text of the description
         const maxLength = 200;
-        if (this.description.length <= maxLength) {
+        if (description.length <= maxLength) {
             pDescriptionPlat.textContent = description; //If the text does not exceed the maxlength, put this
         } else {
-            let descriptionShorten = this.description.slice(0, maxLength);
+            let descriptionShorten = description.slice(0, maxLength);
             pDescriptionPlat.textContent = descriptionShorten + `...`; //Otherwise put the text here with his limit text
         }
 
@@ -77,5 +77,5 @@ function recipesFactory(data) {
         return (article);
 
     }
-    return { name, id, servings, ingredients, time, description, appliance, ustensils, getRecipeCardDOM }
+    return {getRecipeCardDOM }
 }
