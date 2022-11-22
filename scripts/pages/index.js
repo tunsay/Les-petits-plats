@@ -340,7 +340,7 @@ function updateResultAfterResearch(resultRecipes) {
         if (resultRecipesByName || resultRecipesByDescription || resultRecipesByIngredient.length >= 1) {
             return true; //return la valeur puis reboucle la fonction
         }
-        return false;//Sinon return false
+        return false;//Sinon return false.
     });
 
     //3- TAGS CHECK
