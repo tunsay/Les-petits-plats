@@ -127,7 +127,8 @@ function filterInputFieldByType(inputType, listType, arrayType, e) {
             listType.append(p)
         }
 
-        newArrayType.map((elementName, i) => { //element, index
+        for (let i = 0; i < newArrayType.length; i++) {
+            const elementName = newArrayType[i];
             let createLI = document.createElement("li");
             createLI.setAttribute("id", elementName + ": " + i)
 
@@ -135,9 +136,7 @@ function filterInputFieldByType(inputType, listType, arrayType, e) {
 
             createLI.innerText = elementName;
             ulType.appendChild(createLI);
-
-            return
-        });
+        }
 
     } else {
         displayTags();
@@ -152,29 +151,38 @@ function displayRecipes(recipes) {
     }
 
     //Display card in the result
-    recipes.map((recipe) => {
+    for (let i = 0; i < recipes.length; i++) {
+        const recipe = recipes[i];
         const recipeModel = recipesFactory(recipe);
         const recipeCardDOM = recipeModel.getRecipeCardDOM();
         listRecipesSection.appendChild(recipeCardDOM);
-    });
+    }
 };
 
 function createTagsArrays(recipeArray) {
     ustensilsArray = [];
     applianceArray = [];
     ingredientsArray = [];
-    recipeArray.map((recipe) => {
+
+    for (let i = 0; i < recipeArray.length; i++) {
+        const recipe = recipeArray[i];
 
         //ustenstiles array
-        recipe.ustensils.map((ustensil) => {
+        for (let i = 0; i < recipe.ustensils.length; i++) {
+            const ustensil = recipe.ustensils[i];
             ustensilsArray.push(ustensil.toLowerCase());
-            ustensilsArray = [...new Set(ustensilsArray)].sort();
-        });
+            ustensilsArray = [...new Set(ustensilsArray)].sort();    
+        }
+
         //Check if the tag, then remove this tag in th array
         removeTagArray(ustensilsArray, ustensilTagsArray);
 
         //ingredients array
-        let ingredientList = recipe.ingredients.map(a => a.ingredient.toLowerCase());
+        let ingredientList = [];
+        for (let i = 0; i < recipe.ingredients.length; i++) {
+            const a = recipe.ingredients[i];
+            ingredientList.push(a.ingredient.toLowerCase());
+        }
         ingredientsArray.push(...ingredientList);
         removeTagArray(ingredientsArray, ingredientTagsArray);
         ingredientsArray = [...new Set(ingredientsArray)].sort();
@@ -183,7 +191,7 @@ function createTagsArrays(recipeArray) {
         applianceArray.push(recipe.appliance.toLowerCase());
         removeTagArray(applianceArray, applianceTagsArray);
         applianceArray = [...new Set(applianceArray)].sort();
-    })
+    }
 }
 
 //Remove the tag  when clicked
@@ -207,36 +215,37 @@ function displayTags() {
     ingredientList.append(ulIngredient);
     applianceList.append(ulAppliance);
     ustensilList.append(ulUstensil);
-
-    ingredientsArray.map((ing, i) => {
+    
+    for (let i = 0; i < ingredientsArray.length; i++) {
+        const ing = ingredientsArray[i];
         let createLI = document.createElement("li");
         createLI.setAttribute("id", `${ing}-${i}`)
-
+    
         clickTags(createLI, "ingredient", ing);
-
+    
         createLI.innerText = ing;
-        ulIngredient.appendChild(createLI);
-    });
-
-    applianceArray.map((app, i) => {
+        ulIngredient.appendChild(createLI);  
+    }
+    for (let i = 0; i < applianceArray.length; i++) {
+        const app = applianceArray[i];
         let createLI = document.createElement("li");
         createLI.setAttribute("id", `${app}-${i}`)
 
         clickTags(createLI, "appliance", app);
 
         createLI.innerText = app;
-        ulAppliance.appendChild(createLI);
-    });
-
-    ustensilsArray.map((ust, i) => {
+        ulAppliance.appendChild(createLI); 
+    }
+    for (let i = 0; i < ustensilsArray.length; i++) {
+        const ust = ustensilsArray[i];
         let createLI = document.createElement("li");
         createLI.setAttribute("id", `${ust}-${i}`)
 
         clickTags(createLI, "ustensil", ust);
 
         createLI.innerText = ust;
-        ulUstensil.appendChild(createLI);
-    });
+        ulUstensil.appendChild(createLI); 
+    }
 }
 
 //This function close tags with parameters the type of the array tag, and the name of the tag
