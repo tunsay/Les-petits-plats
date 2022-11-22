@@ -338,21 +338,20 @@ function clickOnCrossForCloseTag(elementHtml, nameTag) {
 }
 
 function updateResultAfterResearch(resultRecipes) {
-    //1- First of all put all recipes in resultRecipes
-    resultRecipes = recipes;
 
-    //2- Filter resultRecipes by the value of the searchBar
-    resultRecipes = recipes.filter(recipe => { //Récupère chaque Recipe avec filter, ceci est une boucle
+    //1- Filter resultRecipes by the value of the searchBar
+    resultRecipes = []
+    for (let i = 0; i < recipes.length; i++) {
+        const recipe = recipes[i];
         let resultRecipesByName = recipe.name.toLowerCase().includes(searchBarRecipe.value.toLowerCase()); //vérifie si le recipe name concorde avec la value du input, si oui return la valeur dans resultRecipes
         let resultRecipesByDescription = recipe.description.toLowerCase().includes(searchBarRecipe.value.toLowerCase());
         let resultRecipesByIngredient = recipe.ingredients.filter(ing => ing.ingredient.toLowerCase().includes(searchBarRecipe.value.toLowerCase()));
         if (resultRecipesByName || resultRecipesByDescription || resultRecipesByIngredient.length >= 1) {
-            return true; //return la valeur puis reboucle la fonction
+            resultRecipes.push(recipe)
         }
-        return false;//Sinon return false.
-    });
+    }
 
-    //3- TAGS CHECK
+    //2- TAGS CHECK
     if (applianceTagsArray.length > 0) {
 
         resultRecipes = resultRecipes.filter(recipe => {
