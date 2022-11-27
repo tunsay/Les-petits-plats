@@ -329,10 +329,7 @@ function clickOnCrossForCloseTag(elementHtml, nameTag) {
 }
 
 function updateResultAfterResearch(resultRecipes) {
-    //1- First of all put all recipes in resultRecipes
-    resultRecipes = recipes;
-
-    //2- Filter resultRecipes by the value of the searchBar
+    //1- Filter resultRecipes by the value of the searchBar
     resultRecipes = recipes.filter(recipe => { //Récupère chaque Recipe avec filter, ceci est une boucle
         let resultRecipesByName = recipe.name.toLowerCase().includes(searchBarRecipe.value.toLowerCase()); //vérifie si le recipe name concorde avec la value du input, si oui return la valeur dans resultRecipes
         let resultRecipesByDescription = recipe.description.toLowerCase().includes(searchBarRecipe.value.toLowerCase());
@@ -343,7 +340,7 @@ function updateResultAfterResearch(resultRecipes) {
         return false;//Sinon return false.
     });
 
-    //3- TAGS CHECK
+    //2- TAGS CHECK
     if (applianceTagsArray.length > 0) {
 
         resultRecipes = resultRecipes.filter(recipe => {
