@@ -341,11 +341,15 @@ function updateResultAfterResearch(resultRecipes) {
 
     //1- Filter resultRecipes by the value of the searchBar
     resultRecipes = []
+    let resultRecipesByIngredient = []
     for (let i = 0; i < recipes.length; i++) {
         const recipe = recipes[i];
         let resultRecipesByName = recipe.name.toLowerCase().includes(searchBarRecipe.value.toLowerCase()); //vérifie si le recipe name concorde avec la value du input, si oui return la valeur dans resultRecipes
         let resultRecipesByDescription = recipe.description.toLowerCase().includes(searchBarRecipe.value.toLowerCase());
-        let resultRecipesByIngredient = recipe.ingredients.filter(ing => ing.ingredient.toLowerCase().includes(searchBarRecipe.value.toLowerCase()));
+        for (let i = 0; i < recipe.ingredients.length; i++) {
+            const ing = recipe.ingredients[i];
+            resultRecipesByIngredient = ing.ingredient.toLowerCase().includes(searchBarRecipe.value.toLowerCase())
+        }
         if (resultRecipesByName || resultRecipesByDescription || resultRecipesByIngredient.length >= 1) {
             resultRecipes.push(recipe)
         }
